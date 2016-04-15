@@ -5,26 +5,31 @@ import java.awt.Graphics;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
-public class gameCell extends JComponent{
-	int x,y;
-	boolean filled = false;
+public class GameCell extends JComponent{
+	private int x,y;
+	private boolean filled = false;
 	public static int count = 0;
 	private Color color;
 	
-	public gameCell(){
-		super();
-		count++;
-	}
+	public GameCell() {}
 	
-	public gameCell(int x, int y) {
-		x = x;
-		y = y;
+	public GameCell(int x, int y) {
+		this.x = x;
+		this.y = y;
 		count++;
 		setOpaque(true);
 //		setPreferredSize(new Dimension(10, 10));
 		setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.black),
                 this.getBorder()));
+	}
+	
+	public int getXCoord(){
+		return x;
+	}
+	
+	public int getYCoord(){
+		return y;
 	}
 	
 //	public int getX(){
@@ -42,6 +47,10 @@ public class gameCell extends JComponent{
 	public void fill(Color newColor){
 		color = newColor;
 		filled = true;
+	}
+	
+	public boolean getFilled() {
+		return filled;
 	}
 	
 	protected void paintComponent(Graphics g) {

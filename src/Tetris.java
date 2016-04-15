@@ -27,13 +27,8 @@ public class Tetris {
 		 * This panel will have a preferred size of 60% of the main frame. 
 		 * This panel will have a Grid Layout because it will deal with tetrominoes
 		 * in a basic X, Y graph. */
-		JPanel gamePanel = new JPanel();
-		gamePanel.setLayout(new GridLayout(20, 10));
+		TetrisBoard gamePanel = new TetrisBoard();
 		mainFrame.add(gamePanel);
-		gamePanel.setPreferredSize(new Dimension(240, 480));
-		gamePanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.red),
-                gamePanel.getBorder()));
 		
 		/* Put 10 pixels in between the two columns. */
 		mainFrame.add(Box.createRigidArea(new Dimension(10,0)));
@@ -84,26 +79,21 @@ public class Tetris {
 		
 		/*Game logic begins here. */
 	
-//		gamePanel.add(tetronimoes.newTetronimo(3, 0, TetronimoType.I));
-
-		/* For loops that populate the game grid: 10 X 20 grid of gameCells: a 
-		 * JComponent that holds its xy coordinates and a boolean of whether or not
-		 * it is filled. */
-		for(int i = 0; i < 20; i++) {
-			for(int j = 0; j < 10; j++) {
-//				gamePanel.add(tetronimoes.newTetronimo(i, j, TetronimoType.I));
-				Component focusPiece = gamePanel.add(new gameCell(i, j));
-				System.out.println(((gameCell) focusPiece).count);
-				gamePanel.revalidate();
-			}
-		}
+//		gamePanel.add(Tetrominoes.newTetromino(3, 0, TetrominoType.I));
 		
-		Tetronimo tetronimoes = new Tetronimo();
-		Component focusPiece = tetronimoes.newTetronimo(3, 0, TetronimoType.I, gamePanel);
+		TetrominoFactory tetrominoFactory = new TetrominoFactory();
+		TetrominoFactory.Tetromino focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.I, gamePanel);
+		focusPiece.rotate();
+		focusPiece.move();
+		focusPiece.moveRight();
+//		focusPiece.move();
+//		focusPiece.move();
+//		focusPiece.move();
 		
 		
-		System.out.println(gamePanel.getComponentCount());
-		System.out.println(gamePanel.getComponent(1).toString());
+//		System.out.println(focusPiece.getOrientation());
+//		System.out.println(gamePanel.getComponentCount());
+//		System.out.println(gamePanel.getComponent(1).toString());
 //		System.out.println(focusPiece.count);
 
 //		JFrame myFrame = new JFrame("This is my frame.");
