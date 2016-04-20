@@ -1,22 +1,65 @@
 import java.awt.*;
 import javax.swing.*;
+import java.awt.event.*;
 
-public class Tetris {
+public class Tetris implements ActionListener, KeyListener {
+	private TetrominoFactory.Tetromino focusPiece;
+	private TetrisBoard gamePanel;
+	private Timer timer = new Timer(400, this);
+	private TetrominoFactory tetrominoFactory = new TetrominoFactory();
+
 	
-	public static void main(String args[]) {
+	public void actionPerformed(ActionEvent e) {
+		//This if statement fires at initialization.
+		if(focusPiece == null){
+			focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.L, gamePanel);
+			gamePanel.repaint();
+			return;
+		}
+		//This if statement is for adding new piece after last piece can no longer move.
+		if(!focusPiece.move()){
+			if(((GameCell)gamePanel.getComponent(4, 0)).getFilled()){
+				System.exit(0);
+			}
+			//Hack-y code to check if filling cells is impossible.
+			try {
+				focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.L, gamePanel);
+			} catch (NullPointerException a) {
+				System.exit(0);
+			}
+		}
+		gamePanel.repaint();
+	}
+	
+	public void keyPressed(KeyEvent e) {
+		switch (e.getKeyCode()) {
+			case KeyEvent.VK_LEFT:
+				focusPiece.moveLeft();
+				break;
+			case KeyEvent.VK_RIGHT:
+				focusPiece.moveRight();
+				break;
+			case KeyEvent.VK_UP:
+				focusPiece.rotate();
+				break;
+			case KeyEvent.VK_DOWN:
+				focusPiece.move();
+				break;
+		}
+		gamePanel.repaint();
+	}
+	
+	/* abstract methods - do nothing. */
+	public void keyReleased(KeyEvent e){}
+	public void keyTyped(KeyEvent e){}
+	
+	private void createAndShowGUI(){
 		/* Create the main frame - basically boilerplate */
 		JFrame mainFrame = new JFrame("This is the main frame.");
 		mainFrame.setPreferredSize(new Dimension(400, 480));
 		
 		/* Create mainContentPane: a JPanel with BoxLayout aligned along the X-Axis */
-		JPanel mainContentPane = new JPanel() {
-			/* Re-sizable components test. */
-//			protected void paintComponent(Graphics g) {
-//				super.paintComponent(g);
-//				g.setColor(Color.BLUE);
-//				g.fillRect(0, 0, this.getWidth(), this.getHeight());
-//			}
-		};
+		JPanel mainContentPane = new JPanel();
 		mainContentPane.setLayout(new BoxLayout(mainContentPane, BoxLayout.X_AXIS));
 
 		/* Set mainContentPane as the content-pane for top-level container mainFrame */
@@ -27,7 +70,7 @@ public class Tetris {
 		 * This panel will have a preferred size of 60% of the main frame. 
 		 * This panel will have a Grid Layout because it will deal with tetrominoes
 		 * in a basic X, Y graph. */
-		TetrisBoard gamePanel = new TetrisBoard();
+		this.gamePanel = new TetrisBoard();
 		mainFrame.add(gamePanel);
 		
 		/* Put 10 pixels in between the two columns. */
@@ -37,14 +80,7 @@ public class Tetris {
 		 * This panel will have a preferred size of 40% of the main frame.
 		 * This panel will have a Box Layout with a single column to hold 
 		 * two more JPanels: next piece and score. */
-		JPanel infoPanel = new JPanel() {
-//			protected void paintComponent(Graphics g) {
-//				super.paintComponent(g);
-//				System.out.println("Painted first.");
-//				g.setColor(Color.RED);
-//				g.fillRect(0, 0, this.getWidth(),this.getHeight());
-//			}
-		};
+		JPanel infoPanel = new JPanel();
 		infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 		infoPanel.setPreferredSize(new Dimension(160, 400));
 		infoPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -68,73 +104,24 @@ public class Tetris {
 		infoPanel.add(Box.createRigidArea(new Dimension(0,10)));
 		infoPanel.add(scorePanel);
 		mainFrame.add(infoPanel);
-		
-		
+				
 		/* Pack should always come last. - I think. At least it makes sense that you 
 		 * pack things into the main frame after you've added them. */
 		mainFrame.pack();
 		mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		mainFrame.setVisible(true);
-
-		
-		/*Game logic begins here. */
+	}
 	
-//		gamePanel.add(Tetrominoes.newTetromino(3, 0, TetrominoType.I));
-		
-		TetrominoFactory tetrominoFactory = new TetrominoFactory();
-		TetrominoFactory.Tetromino focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.I, gamePanel);
-		focusPiece.rotate();
-		focusPiece.move();
-		focusPiece.moveRight();
-//		focusPiece.move();
-//		focusPiece.move();
-//		focusPiece.move();
-		
-		
-//		System.out.println(focusPiece.getOrientation());
-//		System.out.println(gamePanel.getComponentCount());
-//		System.out.println(gamePanel.getComponent(1).toString());
-//		System.out.println(focusPiece.count);
-
-//		JFrame myFrame = new JFrame("This is my frame.");
-//		myFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//		JPanel myPanel = new JPanel(new BorderLayout()) {
-//			protected void paintComponent(Graphics g) {
-//				g.setColor(Color.BLACK);
-//				g.fillRect(0, 0, 400, 400);
-//			}
-//		};
-//		myPanel.setPreferredSize(new Dimension(400, 400));
-//		myPanel.setOpaque(true);
-//		myPanel.add(new Shape(0, 0), BorderLayout.LINE_START);
-//		myPanel.add(new Shape(100, 100), BorderLayout.LINE_END);
-//		myFrame.setContentPane(myPanel);
-//		myFrame.pack();
-//		myFrame.setVisible(true);
-//		System.out.println(myPanel.getComponentCount());
-//		System.out.println(myFrame.getComponentCount());
-//		System.out.println(myPanel.getNewX());
-//		System.out.println(myPanel.getNewY());
-//		myFrame.addMouseListener(new MouseAdapter() {
-//			public void mouseClicked(MouseEvent e){
-//				if(myFrame.contains(e.getPoint())){
-//					System.exit(0);
-//				}
-//			}
-//		});
-//		final Timer myTimer = new Timer(10, null);
-//		myTimer.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				if(myFrame.x == myFrame.getWidth()) {
-//					((Timer)e.getSource()).stop();
-//					return;
-//				}
-//				myFrame.x++;
-//				myFrame.y++;
-//				myFrame.repaint();
-//				System.out.println(myFrame.x);
-//			}
-//		});
-//		myTimer.start();
+	public static void main(String args[]) {
+		/* The game instance. */
+		Tetris tetris = new Tetris();
+		tetris.createAndShowGUI();
+	
+		/*Game logic begins here. */
+//		TetrominoFactory tetrominoFactory = new TetrominoFactory();
+//		tetris.focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.I, tetris.gamePanel);
+		tetris.gamePanel.addKeyListener(tetris);
+		tetris.gamePanel.grabFocus();
+		tetris.timer.start();
 	}
 }

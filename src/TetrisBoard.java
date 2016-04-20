@@ -12,6 +12,7 @@ public class TetrisBoard extends JPanel{
 	public TetrisBoard(){
 		super();
 		setLayout(new GridLayout(20, 10));
+		setFocusable(true);
 		setPreferredSize(new Dimension(240, 480));
 		/* Sets border for testing. */
 		setBorder(BorderFactory.createCompoundBorder(
