@@ -5,25 +5,20 @@ import java.awt.event.*;
 public class Tetris implements ActionListener, KeyListener {
 	private TetrominoFactory.Tetromino focusPiece;
 	private TetrisBoard gamePanel;
-	private Timer timer = new Timer(400, this);
+	private Timer timer = new Timer(500, this);
 	private TetrominoFactory tetrominoFactory = new TetrominoFactory();
 
 	
 	public void actionPerformed(ActionEvent e) {
 		//This if statement fires at initialization.
 		if(focusPiece == null){
-			focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.L, gamePanel);
-			gamePanel.repaint();
-			return;
+			focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.getNextType(), gamePanel);
 		}
-		//This if statement is for adding new piece after last piece can no longer move.
-		if(!focusPiece.move()){
-			if(((GameCell)gamePanel.getComponent(4, 0)).getFilled()){
-				System.exit(0);
-			}
+		else if(!focusPiece.move()){
+//		This if statement is for adding new piece after last piece can no longer move.
 			//Hack-y code to check if filling cells is impossible.
 			try {
-				focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.L, gamePanel);
+				focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.getNextType(), gamePanel);
 			} catch (NullPointerException a) {
 				System.exit(0);
 			}

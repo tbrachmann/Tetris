@@ -1,14 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TetrisBoard extends JPanel{
 
-//		protected void paintComponent(Graphics g) {
-//			super.paintComponent(g);
-//			System.out.println("Painted first.");
-//			g.setColor(Color.BLUE);
-//			g.fillRect(0, 0, this.getWidth(),this.getHeight());
-//		}
+	private HashMap<Integer, ArrayList<Integer>> filledCoordinates = new HashMap<Integer, ArrayList<Integer>>();
+	
 	public TetrisBoard(){
 		super();
 		setLayout(new GridLayout(20, 10));
@@ -23,19 +22,49 @@ public class TetrisBoard extends JPanel{
 		 * it is filled. */
 		for(int i = 0; i < 20; i++) {
 			for(int j = 0; j < 10; j++) {
-//				gamePanel.add(tetronimoes.newTetronimo(i, j, TetronimoType.I));
-				Component focusPiece = add(new GameCell(j, i));
-//				System.out.println(((gameCell) focusPiece).count);
+				add(new GameCell(j, i));
 				revalidate();
 			}
 		}
 	}
 	
-	private int coordConverter(int x, int y) {
-		return x + (y*10);
+	public boolean fillCells(Coordinate[] newCoordinates, Coordinate[]oldCoordinates, Color newColor){
+		int x;
+		int y;
+		for(Coordinate i : newCoordinates){
+			x = i.getX();
+			y = i.getY();
+			//If Coordinate is already contained by Tetromino, then it can move there no problem.
+			if(oldCoordinates != null && Arrays.asList(oldCoordinates).contains(i)){
+				continue;
+			} else if(x < 0 || x > 9){
+				return false;
+			} else if(y < 0 || y > 19){
+				return false;
+			} else if(filledCoordinates.containsKey(x) && filledCoordinates.get(x).contains(y)){
+				return false;
+			}
+		}
+		if(oldCoordinates != null) {
+			for(Coordinate i : oldCoordinates){
+				getComponent(i).empty();
+				filledCoordinates.get(i.getX()).remove(filledCoordinates.get(i.getX()).indexOf(i.getY()));
+			}
+		}
+		for(Coordinate i : newCoordinates){
+			x = i.getX();
+			y = i.getY();
+			getComponent(i).fill(newColor);
+			if(!filledCoordinates.containsKey(x)){
+				filledCoordinates.put(x, new ArrayList(Arrays.asList(y)));
+			} else {
+				filledCoordinates.get(x).add(y);
+			}
+		}
+		return true;
 	}
 	
-	public Component getComponent(int x, int y) {
-		return super.getComponent(coordConverter(x, y));
+	public GameCell getComponent(Coordinate i) {
+		return (GameCell) super.getComponent(i.getX() + (i.getY()*10));
 	}
 }

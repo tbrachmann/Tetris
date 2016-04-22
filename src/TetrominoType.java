@@ -9,10 +9,7 @@ public enum TetrominoType {
 	private static int lastInt;
 	
 	public static TetrominoType getNextType(){
-		int index = myRandom.nextInt();
-		while(index != lastInt) {
-			index = myRandom.nextInt(7);
-		}
+		int index = myRandom.nextInt(7);
 		return types[index];
 	}
 }

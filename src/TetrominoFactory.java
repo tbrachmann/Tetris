@@ -22,8 +22,14 @@ public class TetrominoFactory extends JComponent{
 		switch (type) {
 			case I:
 				return new IType(x, y, board);
-			case L:
-				return new LType(x, y, board);
+			case Z:
+				return new ZType(x, y, board);
+			case S:
+				return new SType(x, y, board);
+			case O:
+				return new OType(x, y, board);
+			case T:
+				return new TType(x, y, board);
 			default:
 				return new IType(x, y, board);
 		}
@@ -33,11 +39,11 @@ public class TetrominoFactory extends JComponent{
 	
 	public abstract class Tetromino extends JComponent {
 		protected int x,y;
+		protected int pivotIndex;
 		protected TetrominoType type;
 		protected Color color;
 		protected TetrisBoard board;
-		protected GameCell[] occupiedCells = new GameCell[4];
-		protected Orientation myOrientation = Orientation.NORTH;
+		protected Coordinate[] occupiedCells;
 		
 		public Tetromino(int x, int y, TetrisBoard board){
 			this.x = x;
@@ -48,48 +54,73 @@ public class TetrominoFactory extends JComponent{
 			setBorder(BorderFactory.createCompoundBorder(
 	                BorderFactory.createLineBorder(Color.white),
 	                this.getBorder()));
-			if(!fillCells()) {
-				throw new NullPointerException();
+		}
+		
+		public boolean move(){
+			Coordinate oldCoordinate;
+			Coordinate[] newCoordinates = new Coordinate[4];
+			for(int i = 0; i < 4; i++){
+				oldCoordinate = occupiedCells[i];
+				newCoordinates[i] = new Coordinate(oldCoordinate.getX(), oldCoordinate.getY()+1);
+			}
+			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
+				occupiedCells = newCoordinates;
+				return true;
+			} else {
+				return false;
 			}
 		}
 		
-		protected boolean fillCells(){
-//			final long startTime = System.nanoTime();
-			GameCell cell;
-			GameCell[] newCells = new GameCell[4];
-			int newX = 0;
-			int newY = 0;
-			for (int i = 0; i < 4; i++){
-				newX = getNewX(i);
-				newY = getNewY(i);
-				if(newX < 0 || newX > 9){
-					return false;
-				} else if(newY < 0 || newY > 19){
-					return false;
-				}
-				try {
-					cell = (GameCell)board.getComponent(newX, newY);
-				} catch (ArrayIndexOutOfBoundsException e) {
-					return false;
-				}
-				if(cell.getFilled() && !Arrays.asList(occupiedCells).contains(cell)) {
-					return false;
-				} else {
-					newCells[i] = cell;
-				}
+		public boolean moveLeft(){
+			Coordinate oldCoordinate;
+			Coordinate[] newCoordinates = new Coordinate[4];
+			for(int i = 0; i < 4; i++){
+				oldCoordinate = occupiedCells[i];
+				newCoordinates[i] = new Coordinate(oldCoordinate.getX()-1, oldCoordinate.getY());
 			}
-			for(GameCell oldCell : occupiedCells){
-				if(oldCell != null){
-					oldCell.empty();
-				}
+			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
+				occupiedCells = newCoordinates;
+				return true;
+			} else {
+				return false;
 			}
-			occupiedCells = newCells;
-			for(GameCell newCell : occupiedCells) {
-				newCell.fill(color);
+		}
+		
+		public boolean moveRight(){
+			Coordinate oldCoordinate;
+			Coordinate[] newCoordinates = new Coordinate[4];
+			for(int i = 0; i < 4; i++){
+				oldCoordinate = occupiedCells[i];
+				newCoordinates[i] = new Coordinate(oldCoordinate.getX()+1, oldCoordinate.getY());
 			}
-//			final long endTime = System.nanoTime();
-//			System.out.println("Execution time: " + (endTime - startTime));
-			return true;
+			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
+				occupiedCells = newCoordinates;
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		public boolean rotate(){
+			Coordinate pivot;
+			Coordinate oldCoordinate;
+			Coordinate[] newCoordinates = new Coordinate[4];
+			pivot = occupiedCells[pivotIndex];
+			int newX;
+			int newY;
+			for(int i = 0; i < 4; i++){
+				oldCoordinate = occupiedCells[i];
+				newX = pivot.getX() + -1*(oldCoordinate.getY() - pivot.getY());
+				newY = pivot.getY() + (oldCoordinate.getX() - pivot.getX());
+				newCoordinates[i] = new Coordinate(newX, newY);
+//				System.out.println("(" + newX + ", " + newY + ")");
+			}
+			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
+				occupiedCells = newCoordinates;
+				return true;
+			} else {
+				return false;
+			}
 		}
 		
 		public Color getColor() {
@@ -103,132 +134,94 @@ public class TetrominoFactory extends JComponent{
 		public TetrisBoard getBoard() {
 			return board;
 		}
-		
-		public Orientation getOrientation() {
-			return myOrientation;
-		}
-		
-		protected abstract int getNewX(int i);
-		protected abstract int getNewY(int i);
-		public abstract boolean rotate();
-		public abstract boolean move();
-		public abstract boolean moveLeft();
-		public abstract boolean moveRight();
 	}
 	
 	public class IType extends Tetromino{
 		
 		public IType(int x, int y, TetrisBoard board){
 			super(x, y, board);
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+3, y)};
+			this.pivotIndex = 2;
+			if(!board.fillCells(occupiedCells, null, color)) {
+				throw new NullPointerException();
+			}
 		}
 		
 		public String toString() {
 			return "This is an I-tetronimo!";
 		}
+	}
+	
+	public class ZType extends Tetromino{
 		
-		protected int getNewX(int i){
-			switch(i){
-				default:
-					return x;
-				case 1:
-					switch(myOrientation){
-						default: return x-1;
-						case SOUTH: return x-1;
-						case EAST: return x;
-						case WEST: return x;
-					}
-				case 2:
-					switch(myOrientation){
-						default: return x+1;
-						case SOUTH: return x+1;
-						case EAST: return x;
-						case WEST: return x;
-					}
-				case 3:
-					switch(myOrientation){
-						default: return x+2;
-						case SOUTH: return x+2;
-						case EAST: return x;
-						case WEST: return x;
-					}
+		public ZType (int x, int y, TetrisBoard board) {
+			super(x, y, board);
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y+1)};
+			this.pivotIndex = 2;
+			if(!board.fillCells(occupiedCells, null, color)) {
+				throw new NullPointerException();
 			}
 		}
 		
-		protected int getNewY(int i){
-			switch(i){
-				default:
-					return y;
-				case 1:
-					switch(myOrientation){
-						default: return y;
-						case SOUTH: return y;
-						case EAST: return y-1;
-						case WEST: return y-1;
-					}
-				case 2:
-					switch(myOrientation){
-						default: return y;
-						case SOUTH: return y;
-						case EAST: return y+1;
-						case WEST: return y+1;
-					}
-				case 3:
-					switch(myOrientation){
-						default: return y;
-						case SOUTH: return y;
-						case EAST: return y+2;
-						case WEST: return y+2;
-					}
+		public String toString() {
+			return "This is a Z-tetronimo!";
+		}
+		
+	}
+	
+	public class SType extends Tetromino{
+			
+		public SType (int x, int y, TetrisBoard board) {
+			super(x, y, board);
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x-1, y), new Coordinate(x-1, y+1), new Coordinate(x-2, y+1)};
+			this.pivotIndex = 2;
+			if(!board.fillCells(occupiedCells, null, color)) {
+				throw new NullPointerException();
 			}
 		}
 		
+		public String toString() {
+			return "This is an S-tetronimo!";
+		}
+		
+	}
+	
+	public class OType extends Tetromino{
+		
+		public OType (int x, int y, TetrisBoard board) {
+			super(x, y, board);
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x, y+1), new Coordinate(x+1, y+1)};
+			this.pivotIndex = 2;
+			if(!board.fillCells(occupiedCells, null, color)) {
+				throw new NullPointerException();
+			}
+		}
+		
+		//This one doesn't actually rotate
+		@Override
 		public boolean rotate(){
-//			if(x%10 > 7 || x%10 == 0) {
-//				return false;
-//			}
-			Orientation oldOrientation = myOrientation;
-			myOrientation = Orientation.getNextOrientation(myOrientation);
-			if(!fillCells()){
-				myOrientation = oldOrientation;
-				return false;
-			}
-//			System.out.println(myOrientation);
 			return true;
 		}
 		
-		public boolean move(){
-			y++;
-			if(!fillCells()){
-				y--;
-				return false;
-			}
-			return true;
+		public String toString() {
+			return "This is an O-tetronimo!";
 		}
 		
-		public boolean moveLeft(){
-//			if(x%10 == 0) {
-//				return false;
-//			}
-			x--;
-			if(!fillCells()){
-				x++;
-				return false;
+	}
+	
+	public class TType extends Tetromino{
+		
+		public TType (int x, int y, TetrisBoard board) {
+			super(x, y, board);
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y)};
+			this.pivotIndex = 1;
+			if(!board.fillCells(occupiedCells, null, color)) {
+				throw new NullPointerException();
 			}
-			return true;
 		}
 		
-		public boolean moveRight(){
-//			if(myOrientation == Orientation.NORTH || myOrientation == Orientation.SOUTH) {
-//				if((x+3)%10 == 9) return false;
-//			} else if(myOrientation == Orientation.EAST || myOrientation == Orientation.WEST) {
-//				if(x%10 == 9) return true;
-//			}
-			x++;
-			if(!fillCells()){
-				x--;
-				return false;
-			}
-			return true;
+		public String toString() {
+			return "This is a T-tetronimo!";
 		}
 		
 	}
@@ -237,101 +230,32 @@ public class TetrominoFactory extends JComponent{
 		
 		public LType (int x, int y, TetrisBoard board) {
 			super(x, y, board);
-		}
-		
-		protected int getNewX(int i) {
-			switch(i){
-				default:
-					return x;
-				case 1:
-					switch(myOrientation){
-						default: return x-1;
-						case EAST: return x;
-						case WEST: return x;
-					}
-				case 2:
-					switch(myOrientation){
-						default: return x;
-						case EAST: return x-1;
-						case WEST: return x-1;
-					}
-				case 3:
-					switch(myOrientation){
-						default: return x+1;
-						case EAST: return x-1;
-						case WEST: return x-1;
-					}
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x, y+1), new Coordinate(x+1, y), new Coordinate(x+2, y)};
+			this.pivotIndex = 2;
+			if(!board.fillCells(occupiedCells, null, color)) {
+				throw new NullPointerException();
 			}
 		}
 		
-		protected int getNewY(int i) {
-			switch(i){
-				default:
-					switch(myOrientation){
-						default: return y;
-						case EAST: return y+1;
-						case WEST: return y+1;
-					}
-				case 1:
-					return y;
-				case 2:
-					return y+1;
-				case 3:
-					switch(myOrientation){
-						default: return y+1;
-						case EAST: return y+2;
-						case WEST: return y+2;
-					}
+		public String toString() {
+			return "This is an L-tetronimo!";
+		}
+		
+	}
+	
+	public class JType extends Tetromino{
+		
+		public JType (int x, int y, TetrisBoard board) {
+			super(x, y, board);
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+2, y+1)};
+			this.pivotIndex = 1;
+			if(!board.fillCells(occupiedCells, null, color)) {
+				throw new NullPointerException();
 			}
 		}
 		
-		public boolean move(){
-			y++;
-			if(!fillCells()){
-				y--;
-				return false;
-			}
-			return true;
-		}
-		
-		public boolean rotate(){
-//			if((x-1)%10 == 0 || x%10 == 9){
-//				return false;
-//			}
-			Orientation oldOrientation = myOrientation;
-			myOrientation = Orientation.getNextOrientation(myOrientation);
-			if(!fillCells()){
-				myOrientation = oldOrientation;
-				return false;
-			}
-//			System.out.println(myOrientation);
-			return true;
-		}
-		
-		public boolean moveLeft(){
-//			if((x-1)%10 == 0){
-//				return false;
-//			}
-			x--;
-			if(!fillCells()){
-				x++;
-				return false;
-			}
-			return true;
-		}
-		
-		public boolean moveRight(){
-//			if((x+1)%10 == 9 && (myOrientation == Orientation.NORTH || myOrientation == Orientation.NORTH)){
-//				return false;
-//			} else if(x%10 == 9){
-//				return false;
-//			}
-			x++;
-			if(!fillCells()){
-				x--;
-				return false;
-			}
-			return true;
+		public String toString() {
+			return "This is a J-tetronimo!";
 		}
 		
 	}
