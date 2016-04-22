@@ -34,7 +34,7 @@ public class TetrisBoard extends JPanel{
 		for(Coordinate i : newCoordinates){
 			x = i.getX();
 			y = i.getY();
-			//If Coordinate is already contained by Tetromino, then it can move there no problem.
+			//If Coordinate is already contained in Tetromino, then it can move there no problem.
 			if(oldCoordinates != null && Arrays.asList(oldCoordinates).contains(i)){
 				continue;
 			} else if(x < 0 || x > 9){

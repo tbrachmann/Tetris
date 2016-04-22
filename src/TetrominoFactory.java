@@ -30,6 +30,10 @@ public class TetrominoFactory extends JComponent{
 				return new OType(x, y, board);
 			case T:
 				return new TType(x, y, board);
+			case J:
+				return new JType(x, y, board);
+			case L:
+				return new LType(x, y, board);
 			default:
 				return new IType(x, y, board);
 		}
