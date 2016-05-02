@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TetrominoFactory extends JComponent{
 	int x, y;
@@ -61,7 +61,7 @@ public class TetrominoFactory extends JComponent{
 		
 		public boolean move(){
 			Coordinate oldCoordinate;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(int i = 0; i < 4; i++){
 				oldCoordinate = occupiedCells[i];
 				newCoordinates.put(new Coordinate(oldCoordinate.getX(), oldCoordinate.getY()+1), color);
@@ -76,7 +76,7 @@ public class TetrominoFactory extends JComponent{
 		
 		public boolean moveLeft(){
 			Coordinate oldCoordinate;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(int i = 0; i < 4; i++){
 				oldCoordinate = occupiedCells[i];
 				newCoordinates.put(new Coordinate(oldCoordinate.getX()-1, oldCoordinate.getY()), color);
@@ -91,7 +91,7 @@ public class TetrominoFactory extends JComponent{
 		
 		public boolean moveRight(){
 			Coordinate oldCoordinate;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(int i = 0; i < 4; i++){
 				oldCoordinate = occupiedCells[i];
 				newCoordinates.put(new Coordinate(oldCoordinate.getX()+1, oldCoordinate.getY()), color);
@@ -107,7 +107,7 @@ public class TetrominoFactory extends JComponent{
 		public boolean rotate(){
 			Coordinate pivot;
 			Coordinate oldCoordinate;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			pivot = occupiedCells[pivotIndex];
 			int newX;
 			int newY;
@@ -150,7 +150,7 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+3, y)};
 			this.pivotIndex = 2;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}
@@ -170,7 +170,7 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y+1)};
 			this.pivotIndex = 2;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}
@@ -191,7 +191,7 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x-1, y), new Coordinate(x-1, y+1), new Coordinate(x-2, y+1)};
 			this.pivotIndex = 2;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}
@@ -212,7 +212,7 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x, y+1), new Coordinate(x+1, y+1)};
 			this.pivotIndex = 2;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}
@@ -239,7 +239,7 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y)};
 			this.pivotIndex = 1;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}
@@ -260,7 +260,7 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x, y+1), new Coordinate(x+1, y), new Coordinate(x+2, y)};
 			this.pivotIndex = 2;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}
@@ -281,7 +281,7 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+2, y+1)};
 			this.pivotIndex = 1;
-			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}

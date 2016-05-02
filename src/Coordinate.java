@@ -24,4 +24,8 @@ public class Coordinate<XCoord, YCoord> {
 		}
 	}
 	
+	public String toString(){
+		return "(" + x + ", " + y + ")";
+	}
+	
 }

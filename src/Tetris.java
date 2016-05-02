@@ -8,7 +8,6 @@ public class Tetris implements ActionListener, KeyListener {
 	private Timer timer = new Timer(500, this);
 	private TetrominoFactory tetrominoFactory = new TetrominoFactory();
 
-	
 	public void actionPerformed(ActionEvent e) {
 		//This if statement fires at initialization.
 		if(focusPiece == null){
@@ -40,6 +39,12 @@ public class Tetris implements ActionListener, KeyListener {
 			case KeyEvent.VK_DOWN:
 				focusPiece.move();
 				break;
+			case KeyEvent.VK_SPACE:
+				if(timer.isRunning()){
+					timer.stop();
+				} else {
+					timer.start();
+				}
 		}
 		gamePanel.repaint();
 	}
