@@ -13,10 +13,10 @@ public class Tetris implements ActionListener, KeyListener {
 		//This if statement fires at initialization.
 		if(focusPiece == null){
 			focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.getNextType(), gamePanel);
-		}
-		else if(!focusPiece.move()){
+		} else if(!focusPiece.move()){
 //		This if statement is for adding new piece after last piece can no longer move.
 			//Hack-y code to check if filling cells is impossible.
+			gamePanel.getRowsToRemove(focusPiece.getCells());
 			try {
 				focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.getNextType(), gamePanel);
 			} catch (NullPointerException a) {

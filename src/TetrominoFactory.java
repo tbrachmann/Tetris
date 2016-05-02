@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class TetrominoFactory extends JComponent{
 	int x, y;
@@ -37,8 +38,6 @@ public class TetrominoFactory extends JComponent{
 			default:
 				return new IType(x, y, board);
 		}
-		//sets location in gamePanel - coordConverter does not yet exist
-		//gamePanel.coordConverter(x, y);
 	}
 	
 	public abstract class Tetromino extends JComponent {
@@ -62,13 +61,13 @@ public class TetrominoFactory extends JComponent{
 		
 		public boolean move(){
 			Coordinate oldCoordinate;
-			Coordinate[] newCoordinates = new Coordinate[4];
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
 			for(int i = 0; i < 4; i++){
 				oldCoordinate = occupiedCells[i];
-				newCoordinates[i] = new Coordinate(oldCoordinate.getX(), oldCoordinate.getY()+1);
+				newCoordinates.put(new Coordinate(oldCoordinate.getX(), oldCoordinate.getY()+1), color);
 			}
-			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
-				occupiedCells = newCoordinates;
+			if(this.board.fillCells(newCoordinates, occupiedCells)){
+				occupiedCells = newCoordinates.keySet().toArray(occupiedCells);
 				return true;
 			} else {
 				return false;
@@ -77,13 +76,13 @@ public class TetrominoFactory extends JComponent{
 		
 		public boolean moveLeft(){
 			Coordinate oldCoordinate;
-			Coordinate[] newCoordinates = new Coordinate[4];
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
 			for(int i = 0; i < 4; i++){
 				oldCoordinate = occupiedCells[i];
-				newCoordinates[i] = new Coordinate(oldCoordinate.getX()-1, oldCoordinate.getY());
+				newCoordinates.put(new Coordinate(oldCoordinate.getX()-1, oldCoordinate.getY()), color);
 			}
-			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
-				occupiedCells = newCoordinates;
+			if(this.board.fillCells(newCoordinates, occupiedCells)){
+				occupiedCells = newCoordinates.keySet().toArray(occupiedCells);
 				return true;
 			} else {
 				return false;
@@ -92,13 +91,13 @@ public class TetrominoFactory extends JComponent{
 		
 		public boolean moveRight(){
 			Coordinate oldCoordinate;
-			Coordinate[] newCoordinates = new Coordinate[4];
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
 			for(int i = 0; i < 4; i++){
 				oldCoordinate = occupiedCells[i];
-				newCoordinates[i] = new Coordinate(oldCoordinate.getX()+1, oldCoordinate.getY());
+				newCoordinates.put(new Coordinate(oldCoordinate.getX()+1, oldCoordinate.getY()), color);
 			}
-			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
-				occupiedCells = newCoordinates;
+			if(this.board.fillCells(newCoordinates, occupiedCells)){
+				occupiedCells = newCoordinates.keySet().toArray(occupiedCells);
 				return true;
 			} else {
 				return false;
@@ -108,7 +107,7 @@ public class TetrominoFactory extends JComponent{
 		public boolean rotate(){
 			Coordinate pivot;
 			Coordinate oldCoordinate;
-			Coordinate[] newCoordinates = new Coordinate[4];
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
 			pivot = occupiedCells[pivotIndex];
 			int newX;
 			int newY;
@@ -116,11 +115,11 @@ public class TetrominoFactory extends JComponent{
 				oldCoordinate = occupiedCells[i];
 				newX = pivot.getX() + -1*(oldCoordinate.getY() - pivot.getY());
 				newY = pivot.getY() + (oldCoordinate.getX() - pivot.getX());
-				newCoordinates[i] = new Coordinate(newX, newY);
+				newCoordinates.put(new Coordinate(newX, newY), color);
 //				System.out.println("(" + newX + ", " + newY + ")");
 			}
-			if(this.board.fillCells(newCoordinates, occupiedCells, color)){
-				occupiedCells = newCoordinates;
+			if(this.board.fillCells(newCoordinates, occupiedCells)){
+				occupiedCells = newCoordinates.keySet().toArray(occupiedCells);
 				return true;
 			} else {
 				return false;
@@ -138,6 +137,11 @@ public class TetrominoFactory extends JComponent{
 		public TetrisBoard getBoard() {
 			return board;
 		}
+		
+		public Coordinate[] getCells(){
+			return occupiedCells;
+		}
+		
 	}
 	
 	public class IType extends Tetromino{
@@ -146,7 +150,11 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+3, y)};
 			this.pivotIndex = 2;
-			if(!board.fillCells(occupiedCells, null, color)) {
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			for(Coordinate coord : occupiedCells) {
+				newCoordinates.put(coord, color);
+			}
+			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}
 		}
@@ -162,7 +170,11 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y+1)};
 			this.pivotIndex = 2;
-			if(!board.fillCells(occupiedCells, null, color)) {
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			for(Coordinate coord : occupiedCells) {
+				newCoordinates.put(coord, color);
+			}
+			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}
 		}
@@ -179,7 +191,11 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x-1, y), new Coordinate(x-1, y+1), new Coordinate(x-2, y+1)};
 			this.pivotIndex = 2;
-			if(!board.fillCells(occupiedCells, null, color)) {
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			for(Coordinate coord : occupiedCells) {
+				newCoordinates.put(coord, color);
+			}
+			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}
 		}
@@ -196,7 +212,11 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x, y+1), new Coordinate(x+1, y+1)};
 			this.pivotIndex = 2;
-			if(!board.fillCells(occupiedCells, null, color)) {
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			for(Coordinate coord : occupiedCells) {
+				newCoordinates.put(coord, color);
+			}
+			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}
 		}
@@ -219,7 +239,11 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y)};
 			this.pivotIndex = 1;
-			if(!board.fillCells(occupiedCells, null, color)) {
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			for(Coordinate coord : occupiedCells) {
+				newCoordinates.put(coord, color);
+			}
+			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}
 		}
@@ -236,7 +260,11 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x, y+1), new Coordinate(x+1, y), new Coordinate(x+2, y)};
 			this.pivotIndex = 2;
-			if(!board.fillCells(occupiedCells, null, color)) {
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			for(Coordinate coord : occupiedCells) {
+				newCoordinates.put(coord, color);
+			}
+			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}
 		}
@@ -253,7 +281,11 @@ public class TetrominoFactory extends JComponent{
 			super(x, y, board);
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+2, y+1)};
 			this.pivotIndex = 1;
-			if(!board.fillCells(occupiedCells, null, color)) {
+			HashMap<Coordinate, Color> newCoordinates = new HashMap<Coordinate, Color>();
+			for(Coordinate coord : occupiedCells) {
+				newCoordinates.put(coord, color);
+			}
+			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}
 		}

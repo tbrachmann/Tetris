@@ -32,6 +32,10 @@ public class GameCell extends JComponent{
 		return y;
 	}
 	
+	public Color getColor() {
+		return color;
+	}
+	
 //	public int getX(){
 //		return x;
 //	}
