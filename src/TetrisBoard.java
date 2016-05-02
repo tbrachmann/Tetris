@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.TreeSet;
 import java.util.ArrayList;
@@ -73,12 +74,10 @@ public class TetrisBoard extends JPanel{
 	
 	//This method is called by Tetris when focusPiece can no longer move
 	public void getRowsToRemove(Coordinate[] occupiedCells) {
-		//arg is passed in from Tetris - taken from focusPiece
 		int rowsRemoved = 0;
 		int lastYCoord = 0;
-		ArrayList<ArrayList<Coordinate>> rowsToRemove = new ArrayList<ArrayList<Coordinate>>();
-		TreeSet<Integer> yCoords = new TreeSet<Integer>((y1, y2) -> -1*Integer.compare(y1, y2));
 		//sort occupiedCells to start with greatest Y first
+		TreeSet<Integer> yCoords = new TreeSet<Integer>((y1, y2) -> -1*Integer.compare(y1, y2));
 		for(Coordinate coord : occupiedCells){
 			yCoords.add(coord.getY());
 		}
@@ -87,69 +86,43 @@ public class TetrisBoard extends JPanel{
 			ArrayList<Coordinate> currentRow = filledCoordinates.get(yCoord);
 			//If its full - add to list to move
 			if(currentRow.size() == 10) {
-				rowsToRemove.add(currentRow);
+				removeRow(currentRow);
 				rowsRemoved++;
-			} else if (rowsToRemove.size() != 0){
-			//Fuck below comment... gravity can happen when I'm feeling bored
-			//If its not full - move down all rows above and keep going
-				for(ArrayList<Coordinate> row : rowsToRemove) {
-					System.out.println(row);
-				}
-				removeRows(rowsToRemove, filledCoordinates.get(yCoord), rowsRemoved);
-				rowsToRemove.clear();
+			} else {
+				moveRow(currentRow, rowsRemoved);
 			}
 			lastYCoord = yCoord;
 		}
-		if(rowsToRemove.size() > 0) {
-			lastYCoord--;
-			removeRows(rowsToRemove, filledCoordinates.get(lastYCoord), rowsRemoved);
-			rowsToRemove.clear();
-		}
+		//End for loop, and move on from last used coordinates
+		//If any rows have been removed:
+		int yCoord = lastYCoord--;
 		if(rowsRemoved > 0) {
-			System.out.println("Clearing everything above " + lastYCoord);
-			ArrayList<Coordinate> oldCoordinates = new ArrayList<Coordinate>();
-			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
-			ArrayList<Coordinate> rowToMove;
-			while(lastYCoord >= 0) {
-				if(filledCoordinates.containsKey(lastYCoord)) {
-					rowToMove = filledCoordinates.get(lastYCoord);
-					oldCoordinates.addAll(rowToMove);
-					for(Coordinate i : rowToMove){
-						newCoordinates.put(new Coordinate(i.getX(), i.getY() + rowsRemoved), getComponent(i).getColor());
-					}
+			while(yCoord >= 0) {
+				ArrayList<Coordinate> currentRow = filledCoordinates.get(yCoord);
+				//if current row exists, then move it down by the total number of rows removed
+				if(currentRow.size() > 0) {
+					moveRow(currentRow, rowsRemoved);
 				}
-				lastYCoord--;
-			}
-			if(oldCoordinates.size() > 0){
-				fillCells(newCoordinates, oldCoordinates.toArray(new Coordinate[oldCoordinates.size()]));
+				yCoord--;
 			}
 		}
-		//Clear list for last time - YOU FORGOT TO IMPLEMENT THIS IDIOT
-		//Basically - for each row where y < yCoord, move it down by number of rows removed
-		
 	}
 	
-	private void removeRows(ArrayList<ArrayList<Coordinate>> rowsToRemove, ArrayList<Coordinate> rowToMove, int rowsRemoved) {
-		ArrayList<Coordinate> oldCoordinates = new ArrayList<Coordinate>();
+	private void moveRow(ArrayList<Coordinate> row, int numberToMove){
 		LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
-		for(ArrayList<Coordinate> row : rowsToRemove){
-			oldCoordinates.addAll(row);
+		for(Coordinate coord : row){
+			newCoordinates.put(new Coordinate(coord.getX(), coord.getY() + numberToMove), getComponent(coord).getColor());
 		}
-		oldCoordinates.addAll(rowToMove);
-//		System.out.println(oldCoordinates.size());
-		rowToMove.replaceAll(c -> new Coordinate(c.getX(), c.getY() + rowsRemoved));
-		for(Coordinate coord : rowToMove) {
-			newCoordinates.put(coord, getComponent(coord).getColor());
+		fillCells(newCoordinates, row.toArray(new Coordinate[row.size()]));
+	}
+	
+	private void removeRow(ArrayList<Coordinate> row) {
+		Iterator<Coordinate> iter = row.iterator();
+		while(iter.hasNext()){
+			Coordinate coord = iter.next();
+			getComponent(coord).empty();
+			iter.remove();
 		}
-//		System.out.println(newCoordinates.size());
-		fillCells(newCoordinates, oldCoordinates.toArray(new Coordinate[oldCoordinates.size()]));
-//		for(int i : filledCoordinates.keySet()) {
-//			System.out.print(i + " -> ");
-//			for(Coordinate c: filledCoordinates.get(i)) {
-//				System.out.print(c.getX() + " ");
-//			}
-//			System.out.print("\n");
-//		}
 	}
 	
 	
