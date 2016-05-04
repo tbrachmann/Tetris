@@ -14,10 +14,14 @@ public class TetrisBoard extends JPanel{
 
 	//Instead of X -> Y's this goes Y -> X's so it will be easier to check if row is ready to be removed.
 	private HashMap<Integer, ArrayList<Coordinate>> filledCoordinates = new HashMap<Integer, ArrayList<Coordinate>>();
+	private final int rows;
+	private final int columns;
 	
-	public TetrisBoard(){
+	public TetrisBoard(int rows, int columns){
 		super();
-		setLayout(new GridLayout(20, 10));
+		this.rows = rows;
+		this.columns = columns;
+		setLayout(new GridLayout(rows, columns));
 		setFocusable(true);
 		setPreferredSize(new Dimension(240, 480));
 		/* Sets border for testing. */
@@ -27,8 +31,8 @@ public class TetrisBoard extends JPanel{
 		/* For loops that populate the game grid: 10 X 20 grid of gameCells: a 
 		 * JComponent that holds its xy coordinates and a boolean of whether or not
 		 * it is filled. */
-		for(int i = 0; i < 20; i++) {
-			for(int j = 0; j < 10; j++) {
+		for(int i = 0; i < rows; i++) {
+			for(int j = 0; j < columns; j++) {
 				add(new GameCell(j, i));
 				revalidate();
 			}
@@ -69,6 +73,13 @@ public class TetrisBoard extends JPanel{
 			}
 		}
 		return true;
+	}
+	
+	public void emptyCells(ArrayList<Coordinate> oldCoordinates) {
+		for(Coordinate coord : oldCoordinates) {
+			getComponent(coord).empty();
+			filledCoordinates.get(coord.getY()).remove(filledCoordinates.get(coord.getY()).indexOf(coord));
+		}
 	}
 	
 	
@@ -127,6 +138,15 @@ public class TetrisBoard extends JPanel{
 	
 	
 	public GameCell getComponent(Coordinate i) {
-		return (GameCell) super.getComponent(i.getX() + (i.getY()*10));
+		return (GameCell) super.getComponent(i.getX() + (i.getY()*columns));
 	}
+	
+	public int getColumns(){
+		return columns;
+	}
+	
+	public int getRows(){
+		return rows;
+	}
+	
 }

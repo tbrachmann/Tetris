@@ -8,36 +8,38 @@ import java.util.LinkedHashMap;
 
 public class TetrominoFactory extends JComponent{
 	int x, y;
-	TetrominoType type;
 	TetrisBoard board;
 	
 	public TetrominoFactory(){
 		super();
 	}
 	
-	public Tetromino newTetronimo(int x, int y, TetrominoType type, TetrisBoard board) {
-		x = x;
-		y = y;
-		type = type;
+	public Tetromino newTetromino(TetrominoType type, Color color, TetrisBoard board) {
+		x = board.getColumns()/3;
+		y = 0;
 		board = board;
 		switch (type) {
 			case I:
-				return new IType(x, y, board);
+				return new IType(x, y, color, board);
 			case Z:
-				return new ZType(x, y, board);
+				return new ZType(x, y, color, board);
 			case S:
-				return new SType(x, y, board);
+				return new SType(x, y, color, board);
 			case O:
-				return new OType(x, y, board);
+				return new OType(x, y, color, board);
 			case T:
-				return new TType(x, y, board);
+				return new TType(x, y, color, board);
 			case J:
-				return new JType(x, y, board);
+				return new JType(x, y, color, board);
 			case L:
-				return new LType(x, y, board);
+				return new LType(x, y, color, board);
 			default:
-				return new IType(x, y, board);
+				return new IType(x, y, color, board);
 		}
+	}
+	
+	public Tetromino addToBoard(Tetromino t, TetrisBoard board) {
+		return this.newTetromino(t.getType(), t.getColor(), board);
 	}
 	
 	public abstract class Tetromino extends JComponent {
@@ -48,15 +50,19 @@ public class TetrominoFactory extends JComponent{
 		protected TetrisBoard board;
 		protected Coordinate[] occupiedCells;
 		
-		public Tetromino(int x, int y, TetrisBoard board){
+		public Tetromino(int x, int y, Color color, TetrisBoard board){
 			this.x = x;
 			this.y = y;
-			this.color = Colors.getNextColor();
 			this.board = board;
+			this.color = color;
 			setFocusable(true);
 			setBorder(BorderFactory.createCompoundBorder(
 	                BorderFactory.createLineBorder(Color.white),
 	                this.getBorder()));
+		}
+		
+		public void remove() {
+			board.emptyCells(new ArrayList<Coordinate>(Arrays.asList(occupiedCells)));
 		}
 		
 		public boolean move(){
@@ -142,13 +148,18 @@ public class TetrominoFactory extends JComponent{
 			return occupiedCells;
 		}
 		
+		public Coordinate getPivot(){
+			return occupiedCells[pivotIndex];
+		}
+		
 	}
 	
 	public class IType extends Tetromino{
 		
-		public IType(int x, int y, TetrisBoard board){
-			super(x, y, board);
-			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+3, y)};
+		public IType(int x, int y, Color color, TetrisBoard board){
+			super(x, y, color, board);
+			this.type = TetrominoType.I;
+			this.occupiedCells = new Coordinate[]{new Coordinate(x-1, y), new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y)};
 			this.pivotIndex = 2;
 			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
@@ -166,8 +177,9 @@ public class TetrominoFactory extends JComponent{
 	
 	public class ZType extends Tetromino{
 		
-		public ZType (int x, int y, TetrisBoard board) {
-			super(x, y, board);
+		public ZType (int x, int y, Color color, TetrisBoard board) {
+			super(x, y, color, board);
+			this.type = TetrominoType.Z;
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y+1)};
 			this.pivotIndex = 2;
 			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
@@ -187,9 +199,10 @@ public class TetrominoFactory extends JComponent{
 	
 	public class SType extends Tetromino{
 			
-		public SType (int x, int y, TetrisBoard board) {
-			super(x, y, board);
-			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x-1, y), new Coordinate(x-1, y+1), new Coordinate(x-2, y+1)};
+		public SType (int x, int y, Color color, TetrisBoard board) {
+			super(x, y, color, board);
+			this.type = TetrominoType.S;
+			this.occupiedCells = new Coordinate[]{new Coordinate(x, y+1), new Coordinate(x+1, y+1), new Coordinate(x+1, y), new Coordinate(x+2, y)};
 			this.pivotIndex = 2;
 			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
 			for(Coordinate coord : occupiedCells) {
@@ -208,8 +221,9 @@ public class TetrominoFactory extends JComponent{
 	
 	public class OType extends Tetromino{
 		
-		public OType (int x, int y, TetrisBoard board) {
-			super(x, y, board);
+		public OType (int x, int y, Color color, TetrisBoard board) {
+			super(x, y, color, board);
+			this.type = TetrominoType.O;
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x, y+1), new Coordinate(x+1, y+1)};
 			this.pivotIndex = 2;
 			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
@@ -235,8 +249,9 @@ public class TetrominoFactory extends JComponent{
 	
 	public class TType extends Tetromino{
 		
-		public TType (int x, int y, TetrisBoard board) {
-			super(x, y, board);
+		public TType (int x, int y, Color color, TetrisBoard board) {
+			super(x, y, color, board);
+			this.type = TetrominoType.T;
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+1, y+1), new Coordinate(x+2, y)};
 			this.pivotIndex = 1;
 			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
@@ -256,8 +271,9 @@ public class TetrominoFactory extends JComponent{
 	
 	public class LType extends Tetromino{
 		
-		public LType (int x, int y, TetrisBoard board) {
-			super(x, y, board);
+		public LType (int x, int y, Color color, TetrisBoard board) {
+			super(x, y, color, board);
+			this.type = TetrominoType.L;
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x, y+1), new Coordinate(x+1, y), new Coordinate(x+2, y)};
 			this.pivotIndex = 2;
 			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();
@@ -277,8 +293,9 @@ public class TetrominoFactory extends JComponent{
 	
 	public class JType extends Tetromino{
 		
-		public JType (int x, int y, TetrisBoard board) {
-			super(x, y, board);
+		public JType (int x, int y, Color color, TetrisBoard board) {
+			super(x, y, color, board);
+			this.type = TetrominoType.J;
 			this.occupiedCells = new Coordinate[]{new Coordinate(x, y), new Coordinate(x+1, y), new Coordinate(x+2, y), new Coordinate(x+2, y+1)};
 			this.pivotIndex = 1;
 			LinkedHashMap<Coordinate, Color> newCoordinates = new LinkedHashMap<Coordinate, Color>();

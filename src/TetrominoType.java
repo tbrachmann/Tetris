@@ -12,6 +12,7 @@ public enum TetrominoType {
 		int index = myRandom.nextInt(7);
 		return types[index];
 	}
+	
 }
 
 
