@@ -14,10 +14,11 @@ public class TetrominoFactory extends JComponent{
 		super();
 	}
 	
-	public Tetromino newTetromino(TetrominoType type, Color color, TetrisBoard board) {
+	public Tetromino newTetromino(TetrominoType type, TetrisBoard board) {
 		x = board.getColumns()/3;
 		y = 0;
 		board = board;
+		Color color = type.color;
 		switch (type) {
 			case I:
 				return new IType(x, y, color, board);
@@ -39,7 +40,7 @@ public class TetrominoFactory extends JComponent{
 	}
 	
 	public Tetromino addToBoard(Tetromino t, TetrisBoard board) {
-		return this.newTetromino(t.getType(), t.getColor(), board);
+		return this.newTetromino(t.getType(), board);
 	}
 	
 	public abstract class Tetromino extends JComponent {

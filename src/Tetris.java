@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 public class Tetris implements ActionListener, KeyListener {
+	
 	private TetrominoFactory.Tetromino focusPiece;
 	private TetrominoFactory.Tetromino nextPiece;
 	private TetrominoFactory.Tetromino holdPiece;
@@ -11,13 +12,14 @@ public class Tetris implements ActionListener, KeyListener {
 	private TetrisBoard holdBoard;
 	private Timer timer = new Timer(500, this);
 	private TetrominoFactory tetrominoFactory = new TetrominoFactory();
+	//why did I need this?
 	private boolean switched = false;
 
 	public void actionPerformed(ActionEvent e) {
 		//This if statement fires at initialization.
 		if(focusPiece == null){
-			focusPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), Colors.getNextColor(), gamePanel);
-			nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), Colors.getNextColor(), nextBoard);
+			focusPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), gamePanel);
+			nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), nextBoard);
 		} else if(!focusPiece.move()){
 //		This if statement is for adding new piece after last piece can no longer move.
 			//Hack-y code to check if filling cells is impossible.
@@ -28,7 +30,7 @@ public class Tetris implements ActionListener, KeyListener {
 				System.exit(0);
 			}
 			nextPiece.remove();
-			nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), Colors.getNextColor(), nextBoard);
+			nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), nextBoard);
 			switched = false;
 		}
 		gamePanel.repaint();
@@ -69,7 +71,7 @@ public class Tetris implements ActionListener, KeyListener {
 					}
 					switched = true;
 					holdPiece = intermediatePiece;
-					nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), Colors.getNextColor(), nextBoard);
+					nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), nextBoard);
 					
 				} else if (!switched){
 					TetrominoFactory.Tetromino intermediatePiece;
@@ -195,8 +197,8 @@ public class Tetris implements ActionListener, KeyListener {
 		mainFrame.pack();
 		mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		mainFrame.setVisible(true);
-		System.out.println(nextLabel.getWidth());
-		System.out.println(nextLabel.getHeight());
+//		System.out.println(nextLabel.getWidth());
+//		System.out.println(nextLabel.getHeight());
 	}
 	
 	public static void main(String args[]) {
