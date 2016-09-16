@@ -39,7 +39,7 @@ public class TetrisBoard extends JPanel{
 		}
 	}
 	
-	public boolean fillCells(LinkedHashMap<Coordinate, Color> newCoordinates, Coordinate[]oldCoordinates){
+	public boolean fillCells(LinkedHashMap<Coordinate, Color> newCoordinates, Coordinate[] oldCoordinates){
 		int x;
 		int y;
 		for(Coordinate i : newCoordinates.keySet()){
@@ -53,6 +53,8 @@ public class TetrisBoard extends JPanel{
 			} else if(y < 0 || y > 19){
 				return false;
 			} else if(filledCoordinates.containsKey(y) && filledCoordinates.get(y).contains(i)){
+				//return false if the coordinates that you want to put a piece are already there - when adding new piece!
+				//this ends the game
 				return false;
 			}
 		}

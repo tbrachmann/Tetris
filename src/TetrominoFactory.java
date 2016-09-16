@@ -166,6 +166,7 @@ public class TetrominoFactory extends JComponent{
 			for(Coordinate coord : occupiedCells) {
 				newCoordinates.put(coord, color);
 			}
+			//exception is here
 			if(!board.fillCells(newCoordinates, null)) {
 				throw new NullPointerException();
 			}

@@ -4,6 +4,9 @@ import java.awt.event.*;
 
 public class Tetris implements ActionListener, KeyListener {
 	
+	public static JFrame mainFrame = new JFrame("This is the main frame.");
+	private static JButton playButton = new JButton("Play");
+
 	private TetrominoFactory.Tetromino focusPiece;
 	private TetrominoFactory.Tetromino nextPiece;
 	private TetrominoFactory.Tetromino holdPiece;
@@ -16,20 +19,29 @@ public class Tetris implements ActionListener, KeyListener {
 	private boolean switched = false;
 
 	public void actionPerformed(ActionEvent e) {
+		//Action command is the name of the button
+		if(e.getActionCommand() == "Play"){
+			createAndShowGameScreen();
+		}
 		//This if statement fires at initialization.
 		if(focusPiece == null){
 			focusPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), gamePanel);
 			nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), nextBoard);
-		} else if(!focusPiece.move()){
-//		This if statement is for adding new piece after last piece can no longer move.
+		}
+		//This else if statement is for adding new piece after last piece can no longer move.
+		else if(!focusPiece.move()){
 			//Hack-y code to check if filling cells is impossible.
 			gamePanel.getRowsToRemove(focusPiece.getCells());
 			try {
 				focusPiece = tetrominoFactory.addToBoard(nextPiece, gamePanel);
+				//Throws a null pointer if it can't be added? Where though?!
 			} catch (NullPointerException a) {
+				/* Game over is here */
 				System.exit(0);
 			}
+			//Removes next piece from its holding spot in nextBoard
 			nextPiece.remove();
+			//Adds the next piece 
 			nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), nextBoard);
 			switched = false;
 		}
@@ -59,6 +71,7 @@ public class Tetris implements ActionListener, KeyListener {
 					timer.start();
 				}
 			case KeyEvent.VK_SHIFT:
+				/* if there's no piece already being held. */
 				if(holdPiece == null){
 					TetrominoFactory.Tetromino intermediatePiece;
 					focusPiece.remove();
@@ -67,12 +80,13 @@ public class Tetris implements ActionListener, KeyListener {
 					try {
 						focusPiece = tetrominoFactory.addToBoard(nextPiece, gamePanel);
 					} catch (NullPointerException f) {
+						/* Game over is here. */
 						System.exit(0);
 					}
 					switched = true;
 					holdPiece = intermediatePiece;
 					nextPiece = tetrominoFactory.newTetromino(TetrominoType.getNextType(), nextBoard);
-					
+				/* if the piece has NOT already been switched (you're only allowed one switch per piece) */	
 				} else if (!switched){
 					TetrominoFactory.Tetromino intermediatePiece;
 					focusPiece.remove();
@@ -80,7 +94,9 @@ public class Tetris implements ActionListener, KeyListener {
 					intermediatePiece = focusPiece;
 					try {
 						focusPiece = tetrominoFactory.addToBoard(holdPiece, gamePanel);
+						//Throws null if the hold piece cannot be added to board and still results in a loss
 					} catch (NullPointerException g) {
+						/* Game over is here */
 						System.exit(0);
 					}
 					holdPiece = tetrominoFactory.addToBoard(intermediatePiece, holdBoard);
@@ -96,10 +112,32 @@ public class Tetris implements ActionListener, KeyListener {
 	public void keyReleased(KeyEvent e){}
 	public void keyTyped(KeyEvent e){}
 	
-	private void createAndShowGUI(){
-		/* Create the main frame - basically boilerplate */
-		JFrame mainFrame = new JFrame("This is the main frame.");
-		mainFrame.setPreferredSize(new Dimension(400, 480));
+	/* This is an attempt to add a menu.*/
+	/* Where do I create and show the game screen?*/
+	private void createAndShowTitleScreen(){
+		/* Set content pane and layout. */
+		JPanel titleScreen = new JPanel();
+		titleScreen.setPreferredSize(new Dimension(400, 400));
+		titleScreen.setLayout(new BoxLayout(titleScreen, BoxLayout.X_AXIS));
+		
+		/* Set titleScreen as mainContentPane. */
+		mainFrame.setContentPane(titleScreen);
+		
+		/* Make button. */
+		/* Its made at the top... */
+		
+		/* Add button to titleScreen. */
+		titleScreen.add(playButton);
+		
+		/* Where to put listeners? */
+		playButton.addActionListener(this);
+		
+		mainFrame.pack();
+		mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		mainFrame.setVisible(true);
+	}
+	
+	public void createAndShowGameScreen(){
 		
 		/* Create mainContentPane: a JPanel with BoxLayout aligned along the X-Axis */
 		JPanel mainContentPane = new JPanel();
@@ -199,18 +237,23 @@ public class Tetris implements ActionListener, KeyListener {
 		mainFrame.setVisible(true);
 //		System.out.println(nextLabel.getWidth());
 //		System.out.println(nextLabel.getHeight());
+		
+		gamePanel.addKeyListener(this);
+		gamePanel.grabFocus();
+		timer.start();
 	}
 	
-	public static void main(String args[]) {
-		/* The game instance. */
+	public static void main(String[] args) {
+		/* Configure the main frame */
+		mainFrame.setPreferredSize(new Dimension(400, 480));
+		
+		/* Create a tetris and then call tetris.createAndShowTitleScreen */
 		Tetris tetris = new Tetris();
-		tetris.createAndShowGUI();
-	
-		/*Game logic begins here. */
-//		TetrominoFactory tetrominoFactory = new TetrominoFactory();
-//		tetris.focusPiece = tetrominoFactory.newTetronimo(3, 0, TetrominoType.I, tetris.gamePanel);
-		tetris.gamePanel.addKeyListener(tetris);
-		tetris.gamePanel.grabFocus();
-		tetris.timer.start();
+		/* This sets the title screen as the main content pane. */
+		tetris.createAndShowTitleScreen();	
+		
+		/* Game over? createAndShowGameOverScreen */
 	}
+	
+	
 }
